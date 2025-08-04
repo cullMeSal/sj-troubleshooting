@@ -1,23 +1,23 @@
-package sj.sj_troubleshooting.Entity;
+package sj.sj_troubleshooting.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-@Table
+@Table(name = "users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "userid")
     private Long id;
 
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "user_password", nullable = false)
+    @Column(name = "pass", nullable = false)
     private String password;
 
-    @Column(name = "user_email", unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 }

@@ -9,5 +9,4 @@ public class SjTroubleshootingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SjTroubleshootingApplication.class, args);
 	}
-
 }
