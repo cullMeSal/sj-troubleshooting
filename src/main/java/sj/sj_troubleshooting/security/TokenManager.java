@@ -9,8 +9,11 @@ import io.jsonwebtoken.Jwts;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import sj.sj_troubleshooting.utils.KeyLoader;
 
 import java.security.Key;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +23,17 @@ import java.util.Map;
 @Component
 public class TokenManager {
     private static final long serialVersionUID = 123456L;
-    public static final long TOKEN_VALIDITY = 60*60; // 60 minutes
 
     @Value("${secret}")
     private String jwtSecret; // get value from application.property
+
+    @Value("${tokenValidity}")
+    private int tokenValidity;
+
+    private RSAPrivateKey privateKey = KeyLoader.loadPrivateKey("/src/main/resources/keys/private_key.pem");
+    private RSAPublicKey publicKey = KeyLoader.loadPublicKey("/src/main/resources/keys/public_key.pem");
+    public TokenManager() throws Exception {
+    }
 
     // generate Jwt token containing username from userDetails, stored in payload
     // combining with header and signature hashed using HS256 algo
@@ -37,8 +47,8 @@ public class TokenManager {
                 .setSubject(userDetails.getUsername()) // Username here is user's email
 //                .claim("role", userDetails.getAuthorities().toArray())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
-                .signWith(getKey(), SignatureAlgorithm.HS256) // specify the algorithm to sign the jwt using specific key
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity))
+                .signWith(publicKey, SignatureAlgorithm.HS256) // specify the algorithm to sign the jwt using specific key
                 .compact();
     }
 
@@ -46,7 +56,7 @@ public class TokenManager {
         final String email = getEmailFromToken(token);
         final Claims claims = Jwts
                 .parser() // initiate parser
-                .setSigningKey(getKey()) // set the key for the parser
+                .setSigningKey(privateKey) // set the key for the parser
                 .build() // build the will-be-immutable parser
                 .parseClaimsJws(token).getBody(); // use parser to decrypt token to get claim in the payload
         // check the expiration state of token (redundant? because parser already check and throw exceptions if token expired)
