@@ -20,11 +20,12 @@ import java.util.Map;
 @Component
 public class TokenManager {
     private static final long serialVersionUID = 123456L;
-    public static final long TOKEN_VALIDITY = 60*60; // 60 minutes
 
     @Value("${secret}")
     private String jwtSecret; // get value from application.property
 
+    @Value("${tokenValidity}")
+    private int tokenValidity;
     // generate Jwt token containing username from userDetails, stored in payload
     // combining with header and signature hashed using HS256 algo
     public String generateJwtToken(UserDetails userDetails){
@@ -37,7 +38,7 @@ public class TokenManager {
                 .setSubject(userDetails.getUsername()) // Username here is user's email
 //                .claim("role", userDetails.getAuthorities().toArray())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidity))
                 .signWith(getKey(), SignatureAlgorithm.HS256) // specify the algorithm to sign the jwt using specific key
                 .compact();
     }

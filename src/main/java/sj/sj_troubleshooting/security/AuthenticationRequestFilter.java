@@ -34,6 +34,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String path = request.getServletPath();
 
+        System.out.println("Filter IS RUNNING");
         // Log when token is not found
         String tokenHeader = request.getHeader("Authorization");
         String email = null;
@@ -56,7 +57,9 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
         System.out.println("tokenHeader: " + tokenHeader);
         System.out.println("token: " + token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (email != null
+//                && SecurityContextHolder.getContext().getAuthentication() == null
+        ) {
             UserDetails userDetails = jwtUserDetailsService.loadUserByEmail(email);
             if (tokenManager.validateJwtToken(token, userDetails)) { // ??? userDetails is found using
                 // the username decoded from token. Then validateJwtToken() returns true if
@@ -68,6 +71,8 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+        System.out.println("ContextHolder is: ");
+        System.out.println(SecurityContextHolder.getContext());
 
         filterChain.doFilter(request, response);
     }
