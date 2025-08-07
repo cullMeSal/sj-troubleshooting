@@ -11,7 +11,7 @@ import sj.sj_troubleshooting.service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -22,18 +22,8 @@ public class UserController {
         System.out.println("helo");
         return ResponseEntity.ok("henlo user");
     }
-    @PostMapping("/register")
-    public ResponseEntity<UserEntity> register(
-            @RequestBody RegisterNewUserDTO registerDTO){
-        return ResponseEntity.ok(userService.registerNewUser(registerDTO));
-    }
-    @GetMapping("/auth")
-    public ResponseEntity<JwtResponseModel> authenticate(
-            @RequestBody JwtRequestModel request
-            ) {
-        return ResponseEntity.ok(userService.authenticateLogin(request));
-    }
-    @GetMapping("/user/{id}")
+
+    @GetMapping("/{id}")
     public ResponseEntity<UserEntity> getUser(@PathVariable("id") Long id, Authentication authentication){
         return ResponseEntity.ok(userService.getUserInfo(id, authentication));
     }
@@ -47,13 +37,13 @@ public class UserController {
         List<?> userList = userService.userQuery(limit, page, username, email);
         return ResponseEntity.ok(userList);
     }
-    @PutMapping("user/update")
+    @PutMapping("/update")
     public ResponseEntity<?> modifyUser(@RequestBody UserEntity updatedUser){
 
         return ResponseEntity.ok(userService.updateUser(updatedUser));
     }
 
-    @DeleteMapping("user/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<?> removeUser(@RequestBody String email){
         boolean deleted = userService.deleteUser(email);
         return ResponseEntity.ok(deleted ? "User deleted" : "User NOT deleted");

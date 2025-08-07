@@ -52,7 +52,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             }
-        } else System.out.println("Bearer String not found in token");
+        } else System.out.println("Bearer String not found in tokenAAAAAAAAAA");
         System.out.println("tokenHeader: " + tokenHeader);
         System.out.println("token: " + token);
 

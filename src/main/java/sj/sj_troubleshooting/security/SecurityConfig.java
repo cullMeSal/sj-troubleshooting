@@ -35,7 +35,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(new BCryptPasswordEncoder(4));
-//        authProvider.authenticate()
+//        authProvider.authenticate();
         return authProvider;
     }
 
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authProvider())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/users/auth","/users/register","/users/sayhii").permitAll()
+                        .requestMatchers("/auth/**","/users/sayhi").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
