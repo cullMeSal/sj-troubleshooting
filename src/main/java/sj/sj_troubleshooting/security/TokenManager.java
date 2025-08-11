@@ -30,8 +30,8 @@ public class TokenManager {
     @Value("${tokenValidity}")
     private int tokenValidity;
 
-    private RSAPrivateKey privateKey = KeyLoader.loadPrivateKey("/src/main/resources/keys/private_key.pem");
-    private RSAPublicKey publicKey = KeyLoader.loadPublicKey("/src/main/resources/keys/public_key.pem");
+    private RSAPrivateKey privateKey = KeyLoader.loadPrivateKey("/keys/private_key.pem");
+    private RSAPublicKey publicKey = KeyLoader.loadPublicKey("/keys/public_key.pem");
     public TokenManager() throws Exception {
     }
 

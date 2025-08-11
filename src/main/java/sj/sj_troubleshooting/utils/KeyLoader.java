@@ -33,6 +33,8 @@ public class KeyLoader {
     }
 
     private static String readKey(String path) throws Exception {
+        System.out.println();
+        System.out.println("Pathhhhh: " +path);
         try (InputStream is = KeyLoader.class.getResourceAsStream(path)) {
             if (is == null) throw new IllegalArgumentException("Key not found: " + path);
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);

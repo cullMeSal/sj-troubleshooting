@@ -76,6 +76,8 @@ public class UserService {
         } catch (BadCredentialsException e) {
             throw new RuntimeException("INVALID_CREDENTIALS", e);
         }
+        System.out.println(request.getPassword());
+        System.out.println("KKKKKKKKKKK");
         final UserDetails userDetails = jwtUserDetailsService.loadUserByEmail(request.getEmail());
         final String jwtToken = tokenManager.generateJwtToken(userDetails);
         return new JwtResponseModel(jwtToken);

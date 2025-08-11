@@ -28,7 +28,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         Optional<UserEntity> foundUser = userRepo.findByEmail(email);
 
-        System.out.println(foundUser.get().getEmail());
+        System.out.println("Found user's EMAIL: "+foundUser.get().getEmail());
         System.out.println(foundUser.get().getPassword());
 //        ArrayList<String> role = new ArrayList<>();
 //        role.add("user");
