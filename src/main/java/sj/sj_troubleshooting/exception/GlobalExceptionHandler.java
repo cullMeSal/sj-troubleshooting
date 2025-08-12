@@ -33,4 +33,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidUserQueryRequest(InvalidUserQueryRequestException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }

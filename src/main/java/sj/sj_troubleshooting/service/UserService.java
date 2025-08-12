@@ -119,8 +119,7 @@ public class UserService {
         System.out.println("Setting up pagination");
         // Pagination
         Integer total = resultList.size();
-        if (total == 0) throw new UsernameNotFoundException("User not found");
-
+        if (total == 0) throw new UserNotFoundException("User not found.");
         // Just page number - ERROR
         if (limit == null && page != null) throw new InvalidUserQueryRequestException(
                 "Invalid Query Request: 'page' param can't be used without 'limit' param.");
@@ -129,7 +128,7 @@ public class UserService {
         int effectiveLimit = (limit != null) ? limit : total;
 
         if (effectiveLimit <= 0 || effectivePage <= 0) {
-            throw new NonPositiveInputException("Page limit and Page number must be positive.");
+            throw new NonPositiveInputException("Page limit must be non-negative and Page number must be positive.");
         }
 
         int start = (effectivePage - 1) * effectiveLimit;

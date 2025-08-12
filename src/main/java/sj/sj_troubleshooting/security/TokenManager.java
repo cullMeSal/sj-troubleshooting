@@ -2,32 +2,30 @@ package sj.sj_troubleshooting.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.Jwts;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 @Component
 public class TokenManager {
     private static final long serialVersionUID = 123456L;
 
-    @Value("${secret}")
-    private String jwtSecret; // get value from application.property
-
     @Value("${tokenValidity}")
     private int tokenValidity;
+
+    @Autowired
+    private RsaKeyManager rsaKeyManager;
+
     // generate Jwt token containing username from userDetails, stored in payload
-    // combining with header and signature hashed using HS256 algo
+    // combining with header and signature hashed using RS256 algo with private key
     public String generateJwtToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
         System.out.println("UserDetails' username is: "+ userDetails.getUsername());
@@ -39,7 +37,7 @@ public class TokenManager {
 //                .claim("role", userDetails.getAuthorities().toArray())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenValidity))
-                .signWith(getKey(), SignatureAlgorithm.HS256) // specify the algorithm to sign the jwt using specific key
+                .signWith(getPrivateKey(), SignatureAlgorithm.RS256) // specify the algorithm to sign the jwt using private key
                 .compact();
     }
 
@@ -47,7 +45,7 @@ public class TokenManager {
         final String email = getEmailFromToken(token);
         final Claims claims = Jwts
                 .parser() // initiate parser
-                .setSigningKey(getKey()) // set the key for the parser
+                .setSigningKey(getPublicKey()) // set the public key for the parser
                 .build() // build the will-be-immutable parser
                 .parseClaimsJws(token).getBody(); // use parser to decrypt token to get claim in the payload
         // check the expiration state of token (redundant? because parser already check and throw exceptions if token expired)
@@ -59,15 +57,17 @@ public class TokenManager {
     public String getEmailFromToken(String token) {
         final Claims claims = Jwts
                 .parser()
-                .setSigningKey(getKey())
+                .setSigningKey(getPublicKey())
                 .build()
                 .parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 
-    private Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        Key key = Keys.hmacShaKeyFor(keyBytes); // generate symmetrical key
-        return key;
+    private PrivateKey getPrivateKey() {
+        return rsaKeyManager.getPrivateKey();
+    }
+
+    private PublicKey getPublicKey() {
+        return rsaKeyManager.getPublicKey();
     }
 }
