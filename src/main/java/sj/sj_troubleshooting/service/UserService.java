@@ -119,6 +119,7 @@ public class UserService {
         System.out.println("Setting up pagination");
         // Pagination
         Integer total = resultList.size();
+        if (total == 0) throw new UsernameNotFoundException("User not found");
 
         // Just page number - ERROR
         if (limit == null && page != null) throw new InvalidUserQueryRequestException(
