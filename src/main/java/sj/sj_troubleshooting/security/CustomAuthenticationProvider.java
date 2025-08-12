@@ -1,6 +1,8 @@
 package sj.sj_troubleshooting.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -8,13 +10,22 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import sj.sj_troubleshooting.service.JwtUserDetailsService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
+
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -26,17 +37,21 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         return authenticateAgainstThirdPartyAndGetAuthentication(name, password);
     }
 
-
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private static UsernamePasswordAuthenticationToken authenticateAgainstThirdPartyAndGetAuthentication(String name, String password) {
+    private UsernamePasswordAuthenticationToken authenticateAgainstThirdPartyAndGetAuthentication(String email, String password) {
         final List<GrantedAuthority> grantedAuths = new ArrayList<>();
         grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-        final UserDetails principal = new User(name, password, grantedAuths);
-        return new UsernamePasswordAuthenticationToken(principal, password, grantedAuths);
+
+        UserDetails userDetails = userDetailsService.loadUserByEmail(email);
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+        return new UsernamePasswordAuthenticationToken(userDetails, null, grantedAuths);
     }
+
 
 }
