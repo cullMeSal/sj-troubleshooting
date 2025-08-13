@@ -54,3 +54,4 @@ class TokenManagerTest {
         assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("USER")));
     }
 }
+

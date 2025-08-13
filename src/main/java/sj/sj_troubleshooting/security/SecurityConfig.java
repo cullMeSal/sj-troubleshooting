@@ -33,11 +33,11 @@ import java.security.interfaces.RSAPublicKey;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-//    @Value("${jwt.private.key}")
-//    RSAPrivateKey privateKey;
-//
-//    @Value("${jwt.public.key}")
-//    RSAPublicKey publicKey;
+    @Value("${jwt.private.key}")
+    RSAPrivateKey privateKey;
+
+    @Value("${jwt.public.key}")
+    RSAPublicKey publicKey;
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
@@ -77,14 +77,15 @@ public class SecurityConfig {
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-//    @Bean
-//    public JwtEncoder keyEncoder(){
-//        JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
-//        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-//        return new NimbusJwtEncoder(jwks);
-//    }
-//    @Bean
-//    public JwtDecoder jwtDecoder(){
-//        return NimbusJwtDecoder.withPublicKey(publicKey).build();
-//    }
+    @Bean
+    public JwtEncoder keyEncoder(){
+        JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
+        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
+    }
+    
+    @Bean
+    public JwtDecoder jwtDecoder(){
+        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+    }
 }

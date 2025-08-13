@@ -44,10 +44,11 @@ public class TokenManager {
     public Boolean validateJwtToken(String token, UserDetails userDetails){
         final String email = getEmailFromToken(token);
         final Claims claims = Jwts
-                .parser() // initiate parser
-                .setSigningKey(getPublicKey()) // set the public key for the parser
-                .build() // build the will-be-immutable parser
-                .parseClaimsJws(token).getBody(); // use parser to decrypt token to get claim in the payload
+                .parser()
+                .verifyWith(getPublicKey()) // Use verifyWith instead of setSigningKey
+                .build()
+                .parseSignedClaims(token) // Use parseSignedClaims instead of parseClaimsJws
+                .getPayload(); // Use getPayload instead of getBody
         // check the expiration state of token (redundant? because parser already check and throw exceptions if token expired)
         Boolean isTokenExpired = claims.getExpiration().before(new Date());
         // TRUE if token got matching email
@@ -57,9 +58,10 @@ public class TokenManager {
     public String getEmailFromToken(String token) {
         final Claims claims = Jwts
                 .parser()
-                .setSigningKey(getPublicKey())
+                .verifyWith(getPublicKey()) // Use verifyWith instead of setSigningKey
                 .build()
-                .parseClaimsJws(token).getBody();
+                .parseSignedClaims(token) // Use parseSignedClaims instead of parseClaimsJws
+                .getPayload(); // Use getPayload instead of getBody
         return claims.getSubject();
     }
 
